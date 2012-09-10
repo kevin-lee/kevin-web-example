@@ -1,13 +1,9 @@
 package com.lckymn.kevin.example.web;
 
-import static com.lckymn.kevin.example.web.WebConstants.*;
-
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+/**
+ * @author Kevin Lee
+ * @version 0.0.1 (2012-09-10)
+ */
 public final class WebConstants
 {
 	public static final String FORWARD_REQUEST = "javax.servlet.forward.request_uri";

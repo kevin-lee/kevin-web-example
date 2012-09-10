@@ -40,6 +40,7 @@
 						</tr>
 					</c:forEach>
 				</table>
+			<div><b>Total: (Should be implemented!)</b></div>
 			<div><input type="submit" value="Update (Not working)"></div>
 			</form>
 			<p>
