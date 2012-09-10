@@ -1,5 +1,7 @@
 package com.lckymn.kevin.example.web;
 
+import static com.lckymn.kevin.example.web.WebConstants.*;
+
 import java.io.IOException;
 
 import javax.servlet.ServletException;
