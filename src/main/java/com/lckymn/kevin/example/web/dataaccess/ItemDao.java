@@ -10,7 +10,7 @@ import com.lckymn.kevin.example.web.beans.Item;
  */
 public interface ItemDao
 {
-	List<Item> getAllItems();
+  List<Item> getAllItems();
 
-	Item findItemById(Long id);
+  Item findItemById(Long id);
 }
