@@ -14,35 +14,63 @@ import javax.servlet.http.HttpServletResponse;
  */
 public final class WebUtil
 {
-  private WebUtil()
-  {
-  }
+	private WebUtil()
+	{
+	}
 
-  public static void forwardTo(final String destination, final HttpServletRequest request,
-      final HttpServletResponse response) throws ServletException, IOException
-  {
-    request.getRequestDispatcher(destination)
-        .forward(request, response);
-  }
+	public static void forwardTo(final String destination, final HttpServletRequest request,
+  	final HttpServletResponse response) throws ServletException, IOException
+	{
+  request.getRequestDispatcher(destination)
+    .forward(request, response);
+	}
 
-  public static void redirectTo(final String destination, final HttpServletResponse response) throws IOException
-  {
-    response.sendRedirect(destination);
-  }
+	public static void redirectTo(final String destination, final HttpServletResponse response) throws IOException
+	{
+  response.sendRedirect(destination);
+	}
 
-  public static boolean forwardToPrevious(final HttpServletRequest request, final HttpServletResponse response)
-      throws ServletException, IOException
+	/**
+	 * Forward the request to the referrer getting from the header ("Referer"). It doesn't forward if the referrer and the
+	 * requestURI are the same.
+	 *
+	 * @param request
+	 * @param response
+	 * @return true if the referrer is found and it's forwarded to the referrer. false otherwise.
+	 * @throws ServletException
+	 * @throws IOException
+	 */
+	public static boolean forwardToPrevious(final HttpServletRequest request, final HttpServletResponse response)
+  	throws ServletException, IOException
+	{
+  final String referrer = request.getHeader(REFERRER);
+  if (null == referrer)
   {
-    final String forwardRequest = (String) request.getAttribute(FORWARD_REQUEST);
-    if (null == forwardRequest)
-    {
-      return false;
-    }
-    else
-    {
-      request.getRequestDispatcher(forwardRequest)
-          .forward(request, response);
-      return true;
-    }
+  	return false;
   }
+  final String contextPath = request.getContextPath();
+  if (referrer.contains(contextPath))
+  {
+  	/* @formatter:off */
+  	final String previousPage = referrer.substring(referrer
+                                        .indexOf(contextPath) +
+                                        contextPath.length());
+  	final String requestUri = request.getRequestURI();
+  	final String requestUriWithoutContextPath =
+    requestUri.contains(contextPath) ?
+      requestUri.substring(requestUri
+                	.indexOf(contextPath) +
+                	contextPath.length()) :
+      requestUri;
+  	/* @formatter:on */
+  	if (requestUriWithoutContextPath.equals(previousPage))
+  	{
+    return false;
+  	}
+  	request.getRequestDispatcher(previousPage)
+    	.forward(request, response);
+  	return true;
+  }
+  return false;
+	}
 }

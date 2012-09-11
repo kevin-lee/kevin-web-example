@@ -6,7 +6,7 @@ package com.lckymn.kevin.example.web;
  */
 public final class WebConstants
 {
-  public static final String FORWARD_REQUEST = "javax.servlet.forward.request_uri";
+  public static final String REFERRER = "Referer";
 
   public static final String ACTION = "action";
   public static final String SHOPPING_CART = "shoppingCart";

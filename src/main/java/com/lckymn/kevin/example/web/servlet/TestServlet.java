@@ -26,89 +26,89 @@ import com.lckymn.kevin.example.web.dataaccess.impl.MockItemDaoImpl;
  */
 public class TestServlet extends HttpServlet
 {
-  private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-  // It is not good to use a DAO object in the Servlet.
-  private ItemDao itemDao;
+	// It is not good to use a DAO object in the Servlet.
+	private ItemDao itemDao;
 
-  public TestServlet()
+	public TestServlet()
+	{
+  this.itemDao = new MockItemDaoImpl();
+	}
+
+	@Override
+	protected void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException,
+  	IOException
+	{
+  doPost(request, response);
+	}
+
+	@Override
+	protected void doPost(final HttpServletRequest request, final HttpServletResponse response) throws ServletException,
+  	IOException
+	{
+  final String action = request.getParameter("action");
+  if (null == action || action.isEmpty())
   {
-    this.itemDao = new MockItemDaoImpl();
+  	request.setAttribute(MESSAGE, "Unknown request");
+  	if (!forwardToPrevious(request, response))
+  	{
+    forwardTo(JSP_ERROR, request, response);
+  	}
   }
-
-  @Override
-  protected void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException,
-      IOException
+  else if ("viewAllItems".equals(action))
   {
-    doPost(request, response);
+  	final List<Item> itemList = itemDao.getAllItems();
+  	request.setAttribute("itemList", itemList);
+  	forwardTo(JSP_ITEM_LIST, request, response);
   }
-
-  @Override
-  protected void doPost(final HttpServletRequest request, final HttpServletResponse response) throws ServletException,
-      IOException
+  else if (action.toLowerCase()
+    .contains(SHOPPING_CART.toLowerCase()))
   {
-    final String action = request.getParameter("action");
-    if (null == action || action.isEmpty())
-    {
-      request.setAttribute(MESSAGE, "Unknown request");
-      if (!forwardToPrevious(request, response))
-      {
-        forwardTo(JSP_ERROR, request, response);
-      }
-    }
-    else if ("viewAllItems".equals(action))
-    {
-      final List<Item> itemList = itemDao.getAllItems();
-      request.setAttribute("itemList", itemList);
-      forwardTo(JSP_ITEM_LIST, request, response);
-    }
-    else if (action.toLowerCase()
-        .contains(SHOPPING_CART.toLowerCase()))
-    {
-      final HttpSession session = request.getSession();
-      ShoppingCart shoppingCart = (ShoppingCart) session.getAttribute(SHOPPING_CART);
-      if (null == shoppingCart)
-      {
-        shoppingCart = new ShoppingCart();
-        session.setAttribute(SHOPPING_CART, shoppingCart);
-      }
-      if ("addToShoppingCart".equals(action))
-      {
-        final String itemId = request.getParameter("itemId");
-        // The input values should be validated.
-        final Long id = Long.valueOf(itemId);
+  	final HttpSession session = request.getSession();
+  	ShoppingCart shoppingCart = (ShoppingCart) session.getAttribute(SHOPPING_CART);
+  	if (null == shoppingCart)
+  	{
+    shoppingCart = new ShoppingCart();
+    session.setAttribute(SHOPPING_CART, shoppingCart);
+  	}
+  	if ("addToShoppingCart".equals(action))
+  	{
+    final String itemId = request.getParameter("itemId");
+    // The input values should be validated.
+    final Long id = Long.valueOf(itemId);
 
-        final Item item = itemDao.findItemById(id);
-        if (null == item)
-        {
-          request.setAttribute(MESSAGE, "Item not found");
-          forwardTo(JSP_ITEM_LIST, request, response);
-          return;
-        }
-
-        shoppingCart.addItem(item);
-        forwardTo(JSP_SHOPPING_CART, request, response);
-      }
-      else if ("viewShoppingCart".equals(action))
-      {
-        forwardTo(JSP_SHOPPING_CART, request, response);
-      }
-      else
-      {
-        request.setAttribute(MESSAGE, "Unsupoorted action");
-        if (!forwardToPrevious(request, response))
-        {
-          forwardTo(JSP_ERROR, request, response);
-        }
-      }
-    }
-    else
+    final Item item = itemDao.findItemById(id);
+    if (null == item)
     {
-      request.setAttribute(MESSAGE, "Unsupoorted action");
-      if (!forwardToPrevious(request, response))
-      {
-        forwardTo(JSP_ERROR, request, response);
-      }
+    	request.setAttribute(MESSAGE, "Item not found");
+    	forwardTo(JSP_ITEM_LIST, request, response);
+    	return;
     }
+
+    shoppingCart.addItem(item);
+    forwardTo(JSP_SHOPPING_CART, request, response);
+  	}
+  	else if ("viewShoppingCart".equals(action))
+  	{
+    forwardTo(JSP_SHOPPING_CART, request, response);
+  	}
+  	else
+  	{
+    request.setAttribute(MESSAGE, "Unsupoorted action");
+    if (!forwardToPrevious(request, response))
+    {
+    	forwardTo(JSP_ERROR, request, response);
+    }
+  	}
   }
+  else
+  {
+  	request.setAttribute(MESSAGE, "Unsupoorted action");
+  	if (!forwardToPrevious(request, response))
+  	{
+    forwardTo(JSP_ERROR, request, response);
+  	}
+  }
+	}
 }
